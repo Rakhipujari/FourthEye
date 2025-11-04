@@ -3,8 +3,8 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from accident_model.data.dataset import AccidentClipDataset, split_metadata_for_loader
-from accident_model.models.c3d import C3D
+from data.dataset import AccidentClipDataset, split_metadata_for_loader
+from models.c3d import C3D
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, roc_auc_score
 from torch.utils.tensorboard import SummaryWriter
