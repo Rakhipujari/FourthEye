@@ -167,6 +167,8 @@ def main():
     parser.add_argument("--accumulate", type=int, default=1, help="Gradient accumulation steps")
     parser.add_argument("--save_every", type=int, default=1, help="Save checkpoint every N epochs")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--resume", default=None, help="Path to checkpoint .pth to resume training from")
+
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -189,11 +191,36 @@ def main():
     # model
     model = C3D(num_classes=args.num_classes).to(device)
     criterion = nn.CrossEntropyLoss()
+    
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    start_epoch = 1
+    if args.resume is not None:
+        ckpt_path = Path(args.resume)
+        if ckpt_path.exists():
+            print(f"Loading checkpoint from {ckpt_path}")
+            ckpt = torch.load(str(ckpt_path), map_location=device)
+            # load model / optimizer state
+            model.load_state_dict(ckpt.get("model_state", ckpt.get("state_dict", {})))
+            if "optimizer_state" in ckpt:
+                try:
+                    optimizer.load_state_dict(ckpt["optimizer_state"])
+                except Exception as e:
+                    print(f"Warning: could not load optimizer state: {e}")
+            # restore epoch and best val info if present
+            ckpt_epoch = ckpt.get("epoch", None)
+            if ckpt_epoch is not None:
+                start_epoch = int(ckpt_epoch) + 1
+            # restore best_val_loss / best_epoch if saved in ckpt
+            best_val_loss = ckpt.get("best_val_loss", best_val_loss)
+            best_epoch = ckpt.get("best_epoch", best_epoch)
+            print(f"Resuming from epoch {start_epoch} (checkpoint epoch was {ckpt_epoch})")
+        else:
+            raise FileNotFoundError(f"Checkpoint {ckpt_path} not found")
+    # --- End resume logic ---
     writer = SummaryWriter(log_dir=str(out_dir / "runs"))
     best_val_loss = float("inf")
     best_epoch = -1
-    for epoch in range(1, args.epochs + 1):
+    for epoch in range(start_epoch, args.epochs + 1):
         t0 = time.time()
         train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device, accumulation_steps=args.accumulate)
         val_loss, val_acc, _, _ = eval_epoch(model, val_loader, criterion, device)
