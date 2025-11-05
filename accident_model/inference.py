@@ -4,8 +4,8 @@ from pathlib import Path
 import numpy as np
 import torch
 import json
-from accident_model.models.c3d import C3D
-from accident_model.preprocessing.generate_clips import sliding_clips_from_folder
+from models.c3d import C3D
+from preprocessing.generate_clips import sliding_clips_from_folder
 
 
 def softmax(x):
