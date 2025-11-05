@@ -33,6 +33,10 @@ def train_epoch(model, loader, criterion, optimizer, device, accumulation_steps=
         preds.extend(out.detach().argmax(dim=1).cpu().numpy().tolist())
         targets.extend(y.cpu().numpy().tolist())
         step += 1
+        if (i + 1) % 10 == 0:
+            elapsed = time.time() - start_time
+            print(f"  [Batch {i+1}/{len(loader)}] avg_loss={np.mean(losses):.4f} time={elapsed:.1f}s", flush=True)
+            start_time = time.time()
     # if optimizer has pending grads
     if step % accumulation_steps != 0:
         optimizer.step()
