@@ -41,7 +41,6 @@ def run_inference_on_folder(model, folder, device, frames_per_clip=16, stride=8,
         timestamps.append(int(start))
         results.append({"start_frame": int(start), "confidence": float(prob)})
     # smoothing (simple moving average)
-    import numpy as np
     conf_arr = np.array(confidences)
     if len(conf_arr) == 0:
         return {"predictions": [], "events": []}
