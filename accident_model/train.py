@@ -193,6 +193,9 @@ def main():
     criterion = nn.CrossEntropyLoss()
     
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    writer = SummaryWriter(log_dir=str(out_dir / "runs"))
+    best_val_loss = float("inf")
+    best_epoch = -1
     start_epoch = 1
     if args.resume is not None:
         ckpt_path = Path(args.resume)
@@ -217,9 +220,6 @@ def main():
         else:
             raise FileNotFoundError(f"Checkpoint {ckpt_path} not found")
     # --- End resume logic ---
-    writer = SummaryWriter(log_dir=str(out_dir / "runs"))
-    best_val_loss = float("inf")
-    best_epoch = -1
     for epoch in range(start_epoch, args.epochs + 1):
         t0 = time.time()
         train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device, accumulation_steps=args.accumulate)
