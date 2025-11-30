@@ -196,7 +196,8 @@ def main():
     writer = SummaryWriter(log_dir=str(out_dir / "runs"))
     best_val_loss = 0.42
     best_epoch = 1
-    start_epoch = 1
+    start_epoch = 2
+    args.epoch=2
     if args.resume is not None:
         ckpt_path = Path(args.resume)
         if ckpt_path.exists():
@@ -209,11 +210,6 @@ def main():
                     optimizer.load_state_dict(ckpt["optimizer_state"])
                 except Exception as e:
                     print(f"Warning: could not load optimizer state: {e}")
-            # restore epoch and best val info if present
-            ckpt_epoch = ckpt.get("epoch", None)
-            if ckpt_epoch is not None:
-                start_epoch = int(ckpt_epoch) + 1
-            # restore best_val_loss / best_epoch if saved in ckpt
             best_val_loss = ckpt.get("best_val_loss", best_val_loss)
             best_epoch = ckpt.get("best_epoch", best_epoch)
             print(f"Resuming from epoch {start_epoch} (checkpoint epoch was {ckpt_epoch})")
