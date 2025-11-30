@@ -212,7 +212,7 @@ def main():
                     print(f"Warning: could not load optimizer state: {e}")
             best_val_loss = ckpt.get("best_val_loss", best_val_loss)
             best_epoch = ckpt.get("best_epoch", best_epoch)
-            print(f"Resuming from epoch {start_epoch} (checkpoint epoch was {ckpt_epoch})")
+            print(f"Resuming from epoch {start_epoch}")
         else:
             raise FileNotFoundError(f"Checkpoint {ckpt_path} not found")
     # --- End resume logic ---
