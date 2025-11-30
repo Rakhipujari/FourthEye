@@ -194,8 +194,8 @@ def main():
     
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     writer = SummaryWriter(log_dir=str(out_dir / "runs"))
-    best_val_loss = float("inf")
-    best_epoch = 0
+    best_val_loss = 0.42
+    best_epoch = 1
     start_epoch = 1
     if args.resume is not None:
         ckpt_path = Path(args.resume)
